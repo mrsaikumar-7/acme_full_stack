@@ -1,20 +1,31 @@
-const express = require('express')
+const express = require('express');
 const app = express();
-const cors = require('cors')
-const mongoose = require('mongoose')
-const router = require("./routes/eventRoute");
-const users = require('./models/user');
-app.use(cors())
+const cors = require('cors');
+const mongoose = require('mongoose');
+const router = require('./routes/eventRoute');
+const usersRouter = require('./routes/users'); // Import the users router
+
+app.use(cors());
 app.use(express.json());
 
-//connnect to mongoose
-mongoose.connect("mongodb+srv://mrsaikumar:mrsaikumar@cluster0.8zu6a2n.mongodb.net/testAcme")
+// Connect to MongoDB using async/await
+async function connectToDatabase() {
+    try {
+        await mongoose.connect("mongodb+srv://mrsaikumar:mrsaikumar@cluster0.8zu6a2n.mongodb.net/testAcme");
+        console.log("Connected to MongoDB");
+    } catch (error) {
+        console.error("Failed to connect to MongoDB:", error);
+    }
+}
 
-//require router
-app.use('/',router)
-app.use('/api/users',users)
+// Call the connectToDatabase function
+connectToDatabase();
 
+// Use the routers
+app.use('/', router);
+app.use('/api/users', usersRouter);
 
-app.listen(3001,function(){
-    console.log("express server is running on port 3001")
+const port = process.env.PORT || 3001;
+app.listen(port, () => {
+    console.log(`Express server is running on port ${port}`);
 });
